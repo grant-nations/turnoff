@@ -70,3 +70,13 @@ def month_to_number(month_string):
         return months[lowercase_month]
     else:
         raise ValueError("Invalid month string")
+
+
+
+def is_month_name(input_string):
+    months = [
+        "january", "february", "march", "april", "may", "june",
+        "july", "august", "september", "october", "november", "december"
+    ]
+    
+    return input_string.lower() in months

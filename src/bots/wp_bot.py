@@ -52,7 +52,10 @@ class WPBot(Bot):
         # remove duplicates
         today_pages = list(set(today_pages))
 
-        # remove articles that end
+        # remove opinion pages
+        # TODO:
+        for page in today_pages:
+            print(page)
 
         # list of dictionaries with title, article summary, and paragraph text
         articles = []
@@ -66,13 +69,11 @@ class WPBot(Bot):
                 time.sleep(2)  # don't wake up the Washington Post caterpillars
                 driver.get(page)
 
-                headline = driver.find_element(by=By.CLASS_NAME, value="headline")
-
-                title = headline.find_element(by=By.TAG_NAME, value="span").text
+                title = driver.find_element(by=By.TAG_NAME, value="h1").text
 
                 subtitle = ""
                 try:
-                    subtitle = driver.find_element(by=By.CLASS_NAME, value="subheadline").text
+                    subtitle = driver.find_element(by=By.TAG_NAME, value="h2").text
                 except:
                     pass
 

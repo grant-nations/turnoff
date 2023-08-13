@@ -6,7 +6,8 @@ import re
 import time
 from typing import List, Dict, Tuple
 import datetime
-from src.utils import month_to_number
+from src.utils import month_to_number, is_month_name
+
 
 class FoxBot(Bot):
 
@@ -55,12 +56,11 @@ class FoxBot(Bot):
                     a_tag = title.find_element(by=By.TAG_NAME, value="a")
                     href = a_tag.get_attribute("href")
                     today_pages.append(href)
-            else: # no time; this article is probable from today (we will check it later)
+            else:  # no time; this article is probable from today (we will check it later)
                 title = article.find_element(by=By.CLASS_NAME, value="title")
                 a_tag = title.find_element(by=By.TAG_NAME, value="a")
                 href = a_tag.get_attribute("href")
                 today_pages.append(href)
-
 
         # remove duplicates (not likely)
         today_pages = list(set(today_pages))
@@ -80,9 +80,17 @@ class FoxBot(Bot):
                 # double check that the page is from today, if not, skip it
                 article_time = driver.find_element(by=By.TAG_NAME, value="time").text
                 time_elements = article_time.split(" ")
-                month = month_to_number(time_elements[0]) # convert month name to number
-                day = int(time_elements[1].replace(",", "")) # remove comma from day
-                year = int(time_elements[2])
+
+                # sometimes it's "Published April 1, 2021" and sometimes it's "April 1, 2021"
+                month_index = 0
+                for i in range(len(time_elements)):
+                    if is_month_name(time_elements[i]):
+                        month_index = i
+                        break
+
+                month = month_to_number(time_elements[month_index])  # convert month name to number
+                day = int(time_elements[month_index + 1].replace(",", ""))  # remove comma from day
+                year = int(time_elements[month_index + 2])
 
                 today = datetime.datetime.today()
                 if today.month != month or today.day != day or today.year != year:
