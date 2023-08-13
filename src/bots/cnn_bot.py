@@ -1,21 +1,21 @@
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
-from bots.news_bot import NewsBot
+from src.bots.news_bot import NewsBot
 import datetime
 import re
 import time
 from typing import List, Dict
 
-class NYTBot(NewsBot):
+
+class CNNBot(NewsBot):
 
     def __init__(self):
-        super().__init__("NYT")
-        # above sets self.name = "NYT"
+        super().__init__("CNN")
 
     def get_articles(self) -> List[Dict[str, str]]:
         """
-        Get the articles from the NYT US section
+        Get the articles from the CNN US section
 
         :return: list of dictionaries with source, title, subtitle, and text
         """
@@ -31,7 +31,7 @@ class NYTBot(NewsBot):
         options.set_preference('javascript.enabled', False)
         driver = webdriver.Firefox(options=options)
 
-        us_url = 'https://www.nytimes.com/section/us'
+        us_url = 'https://www.cnn.com/us'
 
         driver.get(us_url)
 
@@ -49,45 +49,33 @@ class NYTBot(NewsBot):
         # remove duplicates
         today_pages = list(set(today_pages))
 
+        html_pattern = re.compile(r".*\.html$")
+        today_pages = [page for page in today_pages if re.search(html_pattern, page)]
+
         # list of dictionaries with title, article summary, and paragraph text
         articles = []
 
         # get the content of each page
         for page in today_pages:
-            time.sleep(2)  # don't wake up the NYT
+            time.sleep(2)  # don't wake up the CNN weblorbs
             driver.get(page)
 
+            headline = driver.find_element(by=By.CLASS_NAME, value="headline")
+
+            title = headline.find_element(by=By.TAG_NAME, value="h1").text
+
             article = driver.find_element(by=By.TAG_NAME, value="article")
-
-            title = article.find_element(by=By.TAG_NAME, value="h1").text
-
-            summary = ""
-
-            try:
-                summary = article.find_element(by=By.ID, value="article-summary").text
-            except:
-                pass  # summary is <p> tag, so if we didn't find it here we can look for it later
-
-            article_body = article.find_element(by=By.NAME, value="articleBody")
+            article_body = article.find_element(by=By.CLASS_NAME, value="body")
             paragraphs = article_body.find_elements(by=By.TAG_NAME, value="p")
 
             paragraphs_text = [p.text for p in paragraphs]
 
             article_text = '\n'.join(paragraphs_text)
 
-            if not summary:
-                all_p_tags = article.find_elements(by=By.TAG_NAME, value="p")
-
-                for p_tag in all_p_tags:
-                    # could add more things here if they pop up
-                    if p_tag.text and p_tag.text.lower() not in ["advertisement"]:
-                        summary = p_tag.text
-                        break
-
             articles.append({
-                'source': "NYT",
+                'source': self.name,
                 'title': title,
-                'subtitle': summary,
+                'subtitle': "",  # NOTE: CNN articles don't have subtitles
                 'text': article_text
             })
 

@@ -1,10 +1,12 @@
-from utils import print_green, print_red
-from bots.nyt_bot import NYTBot
-from bots.fox_bot import FoxBot
+from src.utils import print_green, print_red
+from src.bots.nyt_bot import NYTBot
+from src.bots.fox_bot import FoxBot
+from src.bots.cnn_bot import CNNBot
 
 bots = [
-    NYTBot(),
-    FoxBot()
+    # NYTBot(),
+    # FoxBot(),
+    CNNBot()
 ]
 
 all_articles = []
