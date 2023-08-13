@@ -1,21 +1,26 @@
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
-from bots.news_bot import NewsBot
+from src.bots.bot import Bot
 import re
 import time
-from typing import List, Dict
+from typing import List, Dict, Tuple
+import datetime
+from src.utils import month_to_number
 
-class FoxBot(NewsBot):
+class FoxBot(Bot):
 
     def __init__(self):
         super().__init__("Fox")
 
-    def get_articles(self) -> List[Dict[str, str]]:
+    def get_articles(self) -> Tuple[List[Dict[str, str]],
+                                    List[Dict[str, str]]]:
         """
-        Get the articles from the Fox News US section
+        Get today's articles from Fox
 
-        :return: list of dictionaries with source, title, subtitle, and text
+        :return: Tuple:
+            list of dictionaries with title, subtitle, and text of each article
+            list of dictionaries with failed pages and their exceptions
         """
 
         today_pattern = r"(\d+)\s+(hour|hours|min|mins|minute|minutes)\s+ago"
@@ -41,13 +46,21 @@ class FoxBot(NewsBot):
 
         # each article has a time stamp (FIND IT)
         for article in main_articles:
-            article_time = article.find_element(by=By.CLASS_NAME, value="time").text
-            if article_time and re.search(today_pattern, article_time):
-                # if the time stamp is today, then add the article to the list of today's articles
+            article_time = article.find_elements(by=By.CLASS_NAME, value="time")
+            if article_time:
+                article_time = article_time[0].text
+                if re.search(today_pattern, article_time):
+                    # if the time stamp is today, then add the article to the list of today's articles
+                    title = article.find_element(by=By.CLASS_NAME, value="title")
+                    a_tag = title.find_element(by=By.TAG_NAME, value="a")
+                    href = a_tag.get_attribute("href")
+                    today_pages.append(href)
+            else: # no time; this article is probable from today (we will check it later)
                 title = article.find_element(by=By.CLASS_NAME, value="title")
                 a_tag = title.find_element(by=By.TAG_NAME, value="a")
                 href = a_tag.get_attribute("href")
                 today_pages.append(href)
+
 
         # remove duplicates (not likely)
         today_pages = list(set(today_pages))
@@ -55,33 +68,52 @@ class FoxBot(NewsBot):
         # list of dictionaries with title, article summary, and paragraph text
         articles = []
 
+        # list of dictionaries with failed pages and their exceptions
+        failed_pages = []
+
         # get the content of each page
         for page in today_pages:
-            time.sleep(2)  # don't wake up the fox
-            driver.get(page)
+            try:
+                time.sleep(2)  # don't wake up the fox
+                driver.get(page)
 
-            article = driver.find_element(by=By.CLASS_NAME, value="main-content")
+                # double check that the page is from today, if not, skip it
+                article_time = driver.find_element(by=By.TAG_NAME, value="time").text
+                time_elements = article_time.split(" ")
+                month = month_to_number(time_elements[0]) # convert month name to number
+                day = int(time_elements[1].replace(",", "")) # remove comma from day
+                year = int(time_elements[2])
 
-            title = article.find_element(by=By.CLASS_NAME, value="headline").text
-            subtitle = article.find_element(by=By.CLASS_NAME, value="sub-headline").text
+                today = datetime.datetime.today()
+                if today.month != month or today.day != day or today.year != year:
+                    continue
 
-            article_body = article.find_element(by=By.CLASS_NAME, value="article-body")
-            paragraphs = article_body.find_elements(by=By.TAG_NAME, value="p")
+                article = driver.find_element(by=By.CLASS_NAME, value="main-content")
 
-            article_text = ""
+                title = article.find_element(by=By.CLASS_NAME, value="headline").text
+                subtitle = article.find_element(by=By.CLASS_NAME, value="sub-headline").text
 
-            for p in paragraphs:
-                # skip the "strong" tags (they're links to other articles)
-                if not p.find_elements(by=By.TAG_NAME, value="strong"):
-                    article_text += p.text + "\n"
+                article_body = article.find_element(by=By.CLASS_NAME, value="article-body")
+                paragraphs = article_body.find_elements(by=By.TAG_NAME, value="p")
 
-            articles.append({
-                'source': "Fox",
-                'title': title,
-                'subtitle': subtitle,
-                'text': article_text
-            })
+                article_text = ""
+
+                for p in paragraphs:
+                    # skip the "strong" tags (they're links to other articles)
+                    if not p.find_elements(by=By.TAG_NAME, value="strong"):
+                        article_text += p.text + "\n"
+
+                articles.append({
+                    'title': title,
+                    'subtitle': subtitle,
+                    'text': article_text
+                })
+            except Exception as e:
+                failed_pages.append({
+                    'page': page,
+                    'exception': str(e)
+                })
 
         driver.quit()
 
-        return articles
+        return articles, failed_pages

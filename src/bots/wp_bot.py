@@ -8,16 +8,15 @@ import time
 from typing import List, Dict, Tuple
 
 
-class NYTBot(Bot):
+class WPBot(Bot):
 
     def __init__(self):
-        super().__init__("NYT")
-        # above sets self.name = "NYT"
+        super().__init__("Washington Post")
 
     def get_articles(self) -> Tuple[List[Dict[str, str]],
                                     List[Dict[str, str]]]:
         """
-        Get today's articles from NYT
+        Get the articles from the Washington Post
 
         :return: Tuple:
             list of dictionaries with title, subtitle, and text of each article
@@ -29,13 +28,13 @@ class NYTBot(Bot):
         month = f"{current_date.month:02d}"  # Zero-padded month (e.g. 06, 07, ...)
         day = f"{current_date.day:02d}"  # Zero-padded day (e.g. 01, 02, ...)
 
-        today_pattern = rf"/{year}/{month}/{day}/.*"
+        today_pattern = rf".*/{year}/{month}/{day}/.*"
 
         options = Options()
         options.set_preference('javascript.enabled', False)
         driver = webdriver.Firefox(options=options)
 
-        us_url = 'https://www.nytimes.com/section/us'
+        us_url = 'https://www.washingtonpost.com'
 
         driver.get(us_url)
 
@@ -53,41 +52,42 @@ class NYTBot(Bot):
         # remove duplicates
         today_pages = list(set(today_pages))
 
+        # remove articles that end
+
         # list of dictionaries with title, article summary, and paragraph text
         articles = []
 
-        # list of dictionaries with failed pages and their exceptions
+        # list of failed pages and their exceptions
         failed_pages = []
 
         # get the content of each page
         for page in today_pages:
             try:
-                time.sleep(2)  # don't wake up the NYT
+                time.sleep(2)  # don't wake up the Washington Post caterpillars
                 driver.get(page)
 
-                article = driver.find_element(by=By.TAG_NAME, value="article")
+                headline = driver.find_element(by=By.CLASS_NAME, value="headline")
 
-                title = article.find_element(by=By.TAG_NAME, value="h1").text
+                title = headline.find_element(by=By.TAG_NAME, value="span").text
 
-                summary = ""
-
+                subtitle = ""
                 try:
-                    summary = article.find_element(by=By.ID, value="article-summary").text
+                    subtitle = driver.find_element(by=By.CLASS_NAME, value="subheadline").text
                 except:
-                    pass  # summary doesn't always have this ID
+                    pass
 
-                article_body = article.find_element(by=By.NAME, value="articleBody")
-                paragraphs = article_body.find_elements(by=By.TAG_NAME, value="p")
+                article = driver.find_element(by=By.TAG_NAME, value="article")
+                paragraphs = article.find_elements(by=By.TAG_NAME, value="p")
 
                 paragraphs_text = [p.text for p in paragraphs]
+
                 article_text = '\n'.join(paragraphs_text)
 
                 articles.append({
                     'title': title,
-                    'subtitle': summary,
+                    'subtitle': subtitle,
                     'text': article_text
                 })
-
             except Exception as e:
                 failed_pages.append({
                     'page': page,

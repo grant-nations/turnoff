@@ -1,23 +1,26 @@
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
-from src.bots.news_bot import NewsBot
+from src.bots.bot import Bot
 import datetime
 import re
 import time
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 
-class CNNBot(NewsBot):
+class CNNBot(Bot):
 
     def __init__(self):
         super().__init__("CNN")
 
-    def get_articles(self) -> List[Dict[str, str]]:
+    def get_articles(self) -> Tuple[List[Dict[str, str]],
+                                    List[Dict[str, str]]]:
         """
-        Get the articles from the CNN US section
+        Get today's articles from CNN
 
-        :return: list of dictionaries with source, title, subtitle, and text
+        :return: Tuple:
+            list of dictionaries with title, subtitle, and text of each article
+            list of dictionaries with failed pages and their exceptions
         """
 
         current_date = datetime.datetime.now()
@@ -55,30 +58,38 @@ class CNNBot(NewsBot):
         # list of dictionaries with title, article summary, and paragraph text
         articles = []
 
+        # list of dictionaries with failed pages and their exceptions
+        failed_pages = []
+
         # get the content of each page
         for page in today_pages:
-            time.sleep(2)  # don't wake up the CNN weblorbs
-            driver.get(page)
+            try:
+                time.sleep(2)  # don't wake up the CNN weblorbs
+                driver.get(page)
 
-            headline = driver.find_element(by=By.CLASS_NAME, value="headline")
+                headline = driver.find_element(by=By.CLASS_NAME, value="headline")
 
-            title = headline.find_element(by=By.TAG_NAME, value="h1").text
+                title = headline.find_element(by=By.TAG_NAME, value="h1").text
 
-            article = driver.find_element(by=By.TAG_NAME, value="article")
-            article_body = article.find_element(by=By.CLASS_NAME, value="body")
-            paragraphs = article_body.find_elements(by=By.TAG_NAME, value="p")
+                article = driver.find_element(by=By.TAG_NAME, value="article")
+                article_body = article.find_element(by=By.CLASS_NAME, value="body")
+                paragraphs = article_body.find_elements(by=By.TAG_NAME, value="p")
 
-            paragraphs_text = [p.text for p in paragraphs]
+                paragraphs_text = [p.text for p in paragraphs]
 
-            article_text = '\n'.join(paragraphs_text)
+                article_text = '\n'.join(paragraphs_text)
 
-            articles.append({
-                'source': self.name,
-                'title': title,
-                'subtitle': "",  # NOTE: CNN articles don't have subtitles
-                'text': article_text
-            })
+                articles.append({
+                    'title': title,
+                    'subtitle': "",  # NOTE: CNN articles don't have subtitles
+                    'text': article_text
+                })
+            except Exception as e:
+                failed_pages.append({
+                    'url': page,
+                    'exception': str(e)
+                })
 
         driver.quit()
 
-        return articles
+        return articles, failed_pages
