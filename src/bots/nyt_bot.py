@@ -2,7 +2,8 @@ from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from src.bots.bot import Bot
-import datetime
+# import datetime
+from src.utils import get_current_date_string
 import re
 import time
 from typing import List, Dict, Tuple
@@ -11,7 +12,7 @@ from typing import List, Dict, Tuple
 class NYTBot(Bot):
 
     def __init__(self):
-        super().__init__("NYT")
+        super().__init__("New York Times")
         # above sets self.name = "NYT"
 
     def get_articles(self) -> Tuple[List[Dict[str, str]],
@@ -24,12 +25,7 @@ class NYTBot(Bot):
             list of dictionaries with failed pages and their exceptions
         """
 
-        current_date = datetime.datetime.now()
-        year = current_date.year
-        month = f"{current_date.month:02d}"  # Zero-padded month (e.g. 06, 07, ...)
-        day = f"{current_date.day:02d}"  # Zero-padded day (e.g. 01, 02, ...)
-
-        today_pattern = rf"/{year}/{month}/{day}/.*"
+        today_pattern = rf"/{get_current_date_string(separator='/')}/.*"
 
         options = Options()
         options.set_preference('javascript.enabled', False)

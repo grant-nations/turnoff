@@ -1,37 +1,31 @@
 # This file runs all of the bots and saves the data to JSON files.
 
 
-from src.utils import print_green, print_red, CHECK_MARK, random_failure_message
+from src.utils import print_green, print_red, CHECK_MARK, random_failure_message, get_current_date_string
 from src.bots.nyt_bot import NYTBot
 from src.bots.fox_bot import FoxBot
 from src.bots.cnn_bot import CNNBot
 from src.bots.wp_bot import WPBot
 import json
-import datetime
 import os
 
 
 def run_bots():
 
     # | Create bots |
-    # V              V
+    # V             V
 
     bots = [
-        # NYTBot(),
-        # FoxBot(),
-        # CNNBot(),
+        NYTBot(),
+        FoxBot(),
+        CNNBot(),
         WPBot()
     ]
 
     # | Create directories for today's data |
     # V                                     V
 
-    current_date = datetime.datetime.now()
-    year = current_date.year
-    month = f"{current_date.month:02d}"  # Zero-padded month (e.g. 06, 07, ...)
-    day = f"{current_date.day:02d}"  # Zero-padded day (e.g. 01, 02, ...)
-
-    today = f"{year}_{month}_{day}"
+    today = get_current_date_string()
 
     articles_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", today)
     if not os.path.exists(articles_path):
@@ -64,7 +58,7 @@ def run_bots():
             print(f"{len(articles)} articles collected")
 
             for article in articles:
-                print_green(CHECK_MARK, end="", flush=True)
+                print_green("  " + CHECK_MARK, end="", flush=True)
                 print(f" {article['title']}")
 
             for failed_page in failed_pages:

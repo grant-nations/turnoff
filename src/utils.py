@@ -1,4 +1,6 @@
 import random
+import tiktoken
+import datetime
 
 CHECK_MARK = "\u2713"
 
@@ -72,11 +74,30 @@ def month_to_number(month_string):
         raise ValueError("Invalid month string")
 
 
-
 def is_month_name(input_string):
     months = [
         "january", "february", "march", "april", "may", "june",
         "july", "august", "september", "october", "november", "december"
     ]
-    
+
     return input_string.lower() in months
+
+
+def num_tokens_from_string(string: str, encoding_name: str = "cl100k_base") -> int:
+    """Returns the number of tokens in a text string.
+
+    Example: num_tokens_from_string("tiktoken is great!", "cl100k_base") -> 4
+    """
+    encoding = tiktoken.get_encoding(encoding_name)
+    num_tokens = len(encoding.encode(string))
+    return num_tokens
+
+def get_current_date_string(separator="_"):
+    current_date = datetime.datetime.now()
+    year = current_date.year
+    month = f"{current_date.month:02d}"  # Zero-padded month (e.g. 06, 07, ...)
+    day = f"{current_date.day:02d}"  # Zero-padded day (e.g. 01, 02, ...)
+
+    today = f"{year}{separator}{month}{separator}{day}"
+
+    return today
