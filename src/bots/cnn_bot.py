@@ -63,12 +63,18 @@ class CNNBot(Bot):
                 time.sleep(2)  # don't wake up the CNN weblorbs
                 driver.get(page)
 
-                headline = driver.find_element(by=By.CLASS_NAME, value="headline")
-
-                title = headline.find_element(by=By.TAG_NAME, value="h1").text
+                title = driver.find_element(by=By.TAG_NAME, value="h1").text
 
                 article = driver.find_element(by=By.TAG_NAME, value="article")
-                article_body = article.find_element(by=By.CLASS_NAME, value="body")
+                article_body = None
+                try:
+                    article_body = article.find_element(by=By.CLASS_NAME, value="body")
+                except:
+                    try:
+                        article_body = article.find_element(by=By.ID, value="body-text")
+                    except Exception as e:
+                        raise e
+                    
                 paragraphs = article_body.find_elements(by=By.TAG_NAME, value="p")
 
                 paragraphs_text = [p.text for p in paragraphs]
@@ -82,7 +88,7 @@ class CNNBot(Bot):
                 })
             except Exception as e:
                 failed_pages.append({
-                    'url': page,
+                    'page': page,
                     'exception': str(e)
                 })
 

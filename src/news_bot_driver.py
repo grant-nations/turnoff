@@ -1,7 +1,7 @@
 # This file runs all of the bots and saves the data to JSON files.
 
 
-from src.utils import print_green, print_red, CHECK_MARK, random_failure_message, get_current_date_string
+from src.utils import print_green, print_red, CHECK_MARK, get_current_date_string
 from src.bots.nyt_bot import NYTBot
 from src.bots.fox_bot import FoxBot
 from src.bots.cnn_bot import CNNBot
@@ -76,7 +76,7 @@ def run_bots():
             })
 
         except Exception as e:
-            print_red(random_failure_message())
+            print_red(e)
             print(f"{e}")
             failed_sites.append({
                 "source": bot.name,

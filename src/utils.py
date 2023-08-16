@@ -33,23 +33,6 @@ def print_cyan(text, end='\n', flush=False):
     print_color(text, "36", end=end, flush=flush)
 
 
-def random_failure_message():
-    failure_messages = [
-        "Oops, the hamster powering our server fell asleep.",
-        "Looks like a squirrel chewed through the internet cables.",
-        "The gremlins are at it again, causing technical mischief.",
-        "Code machine broke.",
-        "A black hole temporarily swallowed our data.",
-        "An alien invasion disrupted our systems. They love memes!",
-        "A glitch in the matrix caused a system malfunction.",
-        "Collision between quantum strings caused singularity.",
-        "The quantum flux capacitor overheated and caused a meltdown.",
-        "We accidentally spilled glitter on the servers, and chaos ensued.",
-    ]
-
-    return random.choice(failure_messages)
-
-
 def month_to_number(month_string):
     months = {
         "january": 1,

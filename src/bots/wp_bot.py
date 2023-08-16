@@ -68,7 +68,22 @@ class WPBot(Bot):
                 except:
                     pass
 
-                article = driver.find_element(by=By.TAG_NAME, value="article")
+                article = None
+
+                try:
+                    # most articles are in an <article> tag
+                    article = driver.find_element(by=By.TAG_NAME, value="article")
+                except:
+                    try:
+                        # sometimes the article is in a <main> tag
+                        article = driver.find_element(by=By.TAG_NAME, value="main")
+                    except:
+                        try:
+                            # this is a last resort
+                            article = driver.find_element(by=By.TAG_NAME, value="body")
+                        except:
+                            pass
+
                 paragraphs = article.find_elements(by=By.TAG_NAME, value="p")
 
                 paragraphs_text = [p.text for p in paragraphs]

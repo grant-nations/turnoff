@@ -11,6 +11,99 @@ import json
 GPT_MODEL = "gpt-3.5-turbo-16k"
 
 
+def get_article_descriptions():
+    WORDS_PER_DESCRIPTION = 100
+
+    load_dotenv()
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+
+    # | Get today's articles from files |
+    # V                                 V
+
+    today = utils.get_current_date_string()
+    articles_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", today, "articles.json")
+
+    articles_data = None
+
+    with open(articles_path, "r") as f:
+        articles_data = json.load(f)
+
+    # | Get the description of each article |
+    # V                                     V
+
+    article_descriptions = {}
+
+    for source_articles in articles_data:
+        source = source_articles["source"]
+        article_descriptions[source] = []
+
+        articles = source_articles["articles"]
+
+        for article in articles:
+            user_str = f"Here's an article from {source}:\n"
+            user_str += f"Title: {article['title']}\n"
+            user_str += f"Text: {article['text']}\n\n"
+
+            # the user_str is the prompt for the AI
+            user_str += f"Give the general description of this article, highlighting the main points. If the article is biased, please note the bias. Please keep the description to within {WORDS_PER_DESCRIPTION} words."
+
+            ai_role = "You are an educated AI that views the world through the lense of existentialism. "
+            ai_role += "Generally, you find the divisiveness of humanity baffling, humorous, and often times sad. "
+            ai_role += "You are employed as a reporter for an AI news agency that reports daily on human affairs."
+
+            # the messages are the context for the AI; the first message is the AI's role
+            messages = [
+                {"role": "system",
+                    "content": ai_role},
+                {"role": "user",
+                    "content": user_str}
+            ]
+
+            print("Sending request to OpenAI:")
+            print("System:")
+            print(ai_role)
+            print("--------------------")
+            print("User:")
+            print(user_str)
+            print("--------------------")
+
+            # send the request to OpenAI
+            response = openai.ChatCompletion.create(
+                model=GPT_MODEL,
+                messages=messages
+            )
+
+            response_text = response["choices"][0]["message"]["content"]
+
+            # response_text = "fake response"
+
+            print("Response:")
+            print(response_text)
+            print("--------------------")
+
+            article_descriptions[source].append({
+                "title": article["title"],
+                "description": response_text
+            })
+
+    # | Save the article descriptions to a file |
+    # V                                         V
+
+    article_descriptions_path = os.path.join(
+        os.path.dirname(os.path.dirname(__file__)), "data", today, "article_descriptions.json")
+
+    with open(article_descriptions_path, "w") as f:
+        json.dump(article_descriptions, f, indent=2)
+
+
+def sort_articles_by_description():
+    pass  # TODO
+
+
+def get_article_summary():
+    pass  # TODO
+
+
 def run_summary():
     load_dotenv()
     openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -84,14 +177,14 @@ def run_summary():
                     user_str += f"Text: {article['text']}\n\n"
 
                 # the user_str is the prompt for the AI
-                user_str += f"Summarize these articles, including only the information that is relevant to the general state of the human world. \
-                    If the articles are biased, please remove the bias. Please keep the summary under {2000} words.\n"
+                user_str += f"Summarize each of these articles, including only the information that is relevant to the general state of the human world. \
+                    If the articles are biased, please note the bias. Please keep the summary under {500} words. Additionally, provide a general description\
+                        of each article that is at most two sentences. Format each article summary with the article title, then the summary\n"
 
                 # the messages are the context for the AI; the first message is the AI's role
                 messages = [
                     {"role": "system",
-                        "content": "You are an educated AI that views the world through the lense of existentialism. \
-                            You are employed as a reporter for an AI news agency that reports daily on human affairs."},
+                        "content": "You are an educated AI that views the world through the lense of existentialism. Generally, you find the divisiveness of humanity baffling, humorous, and often times sad. You are employed as a reporter for an AI news agency that reports daily on human affairs."},
                     {"role": "user",
                         "content": user_str}
                 ]
@@ -128,4 +221,4 @@ def run_summary():
 
 
 if __name__ == "__main__":
-    run_summary()
+    get_article_descriptions()
