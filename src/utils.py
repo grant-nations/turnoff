@@ -1,6 +1,7 @@
 import random
 import tiktoken
 import datetime
+import re
 
 CHECK_MARK = "\u2713"
 
@@ -75,6 +76,7 @@ def num_tokens_from_string(string: str, encoding_name: str = "cl100k_base") -> i
     num_tokens = len(encoding.encode(string))
     return num_tokens
 
+
 def get_current_date_string(separator="_"):
     current_date = datetime.datetime.now()
     year = current_date.year
@@ -84,3 +86,34 @@ def get_current_date_string(separator="_"):
     today = f"{year}{separator}{month}{separator}{day}"
 
     return today
+
+
+def get_yesterday_date_string(separator="_"):
+    current_date = datetime.datetime.now()
+    year = current_date.year
+    month = f"{current_date.month:02d}"  # Zero-padded month (e.g. 06, 07, ...)
+    day = f"{(current_date.day - 1):02d}"  # Zero-padded day (e.g. 01, 02, ...)
+
+    today = f"{year}{separator}{month}{separator}{day}"
+
+    return today
+
+
+def get_score_from_text(text):
+    numbers = re.findall(r'\d+', text)  # Find all numbers in the string
+    if numbers:
+        lowest_number = min(map(int, numbers))  # Convert to integers and find the lowest
+        return lowest_number
+    else:
+        return -1  # Return None if no numbers are found
+
+
+def remove_hashtags(tweet):
+    # Use regular expression to find and remove hashtags
+    cleaned_tweet = re.sub(r'#\w+', '', tweet)
+    return cleaned_tweet.strip()
+
+
+def remove_quotations(input_string):
+    cleaned_string = input_string.replace('"', '').replace("'", "")
+    return cleaned_string
