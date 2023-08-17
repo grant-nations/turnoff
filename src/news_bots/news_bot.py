@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Dict, Tuple
 
 
-class Bot(ABC):
+class NewsBot(ABC):
     def __init__(self, name):
         self.name = name
 

@@ -2,10 +2,10 @@
 
 
 from src.utils import print_green, print_red, CHECK_MARK, get_current_date_string
-from src.bots.nyt_bot import NYTBot
-from src.bots.fox_bot import FoxBot
-from src.bots.cnn_bot import CNNBot
-from src.bots.wp_bot import WPBot
+from src.news_bots.nyt_bot import NYTBot
+from src.news_bots.fox_bot import FoxBot
+from src.news_bots.cnn_bot import CNNBot
+from src.news_bots.wp_bot import WPBot
 import json
 import os
 

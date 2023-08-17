@@ -1,24 +1,23 @@
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
-from src.bots.bot import Bot
+from src.news_bots.news_bot import Bot
 # import datetime
-from src.utils import get_current_date_string
 import re
 import time
 from typing import List, Dict, Tuple
+from src.utils import get_current_date_string
 
 
-class NYTBot(Bot):
+class CNNBot(Bot):
 
     def __init__(self):
-        super().__init__("New York Times")
-        # above sets self.name = "NYT"
+        super().__init__("CNN")
 
     def get_articles(self) -> Tuple[List[Dict[str, str]],
                                     List[Dict[str, str]]]:
         """
-        Get today's articles from NYT
+        Get today's articles from CNN
 
         :return: Tuple:
             list of dictionaries with title, subtitle, and text of each article
@@ -31,7 +30,7 @@ class NYTBot(Bot):
         options.set_preference('javascript.enabled', False)
         driver = webdriver.Firefox(options=options)
 
-        us_url = 'https://www.nytimes.com/section/us'
+        us_url = 'https://www.cnn.com/us'
 
         driver.get(us_url)
 
@@ -49,6 +48,9 @@ class NYTBot(Bot):
         # remove duplicates
         today_pages = list(set(today_pages))
 
+        html_pattern = re.compile(r".*\.html$")
+        today_pages = [page for page in today_pages if re.search(html_pattern, page)]
+
         # list of dictionaries with title, article summary, and paragraph text
         articles = []
 
@@ -58,32 +60,32 @@ class NYTBot(Bot):
         # get the content of each page
         for page in today_pages:
             try:
-                time.sleep(2)  # don't wake up the NYT
+                time.sleep(2)  # don't wake up the CNN weblorbs
                 driver.get(page)
 
+                title = driver.find_element(by=By.TAG_NAME, value="h1").text
+
                 article = driver.find_element(by=By.TAG_NAME, value="article")
-
-                title = article.find_element(by=By.TAG_NAME, value="h1").text
-
-                summary = ""
-
+                article_body = None
                 try:
-                    summary = article.find_element(by=By.ID, value="article-summary").text
+                    article_body = article.find_element(by=By.CLASS_NAME, value="body")
                 except:
-                    pass  # summary doesn't always have this ID
-
-                article_body = article.find_element(by=By.NAME, value="articleBody")
+                    try:
+                        article_body = article.find_element(by=By.ID, value="body-text")
+                    except Exception as e:
+                        raise e
+                    
                 paragraphs = article_body.find_elements(by=By.TAG_NAME, value="p")
 
                 paragraphs_text = [p.text for p in paragraphs]
+
                 article_text = '\n'.join(paragraphs_text)
 
                 articles.append({
                     'title': title,
-                    'subtitle': summary,
+                    'subtitle': "",  # NOTE: CNN articles don't have subtitles
                     'text': article_text
                 })
-
             except Exception as e:
                 failed_pages.append({
                     'page': page,

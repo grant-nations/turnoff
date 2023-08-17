@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
-from src.bots.bot import Bot
+from src.news_bots.news_bot import Bot
 from src.utils import get_current_date_string
 # import datetime
 import re

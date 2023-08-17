@@ -366,9 +366,9 @@ def write_tweet_from_summaries():
         print("Tweet too long ", end="", flush=True)
         utils.print_red("X")
 
-    tweets_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", today, "tweet.txt")
+    tweet_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", today, "tweet.txt")
 
-    with open(tweets_path, "w") as f:
+    with open(tweet_path, "w") as f:
         f.write(tweet)
 
 
