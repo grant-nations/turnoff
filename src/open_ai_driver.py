@@ -277,7 +277,7 @@ def write_tweet_from_summaries():
     # ai_role += "Generally, you find the divisiveness of humanity baffling, humorous, and often times sad. "
     ai_role += "You are employed as a reporter for an AI news agency that reports daily on human affairs."
 
-    user_str = "Please write a short tweet about the current state of the human world. Below are some news articles from today; feel free to use them if necessary. Make sure to keep the tweet to within 200 characters.\n\n"
+    user_str = "Write a tweet about something you find noteworthy in today's human events. Below are summaries of some news articles from today; feel free to use them if necessary. Make sure to keep the tweet to within 280 characters.\n\n"
 
     for _, articles in summaries.items():
         for article in articles:
@@ -370,10 +370,3 @@ def write_tweet_from_summaries():
 
     with open(tweet_path, "w") as f:
         f.write(tweet)
-
-
-if __name__ == "__main__":
-    # get_article_scores()
-    # summarize_top_articles()
-    write_tweet_from_summaries()
-    # pass

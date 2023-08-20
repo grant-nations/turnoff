@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
-from src.news_bots.news_bot import Bot
+from src.news_bots.news_bot import NewsBot
 # import datetime
 from src.utils import get_current_date_string
 import re
@@ -9,7 +9,7 @@ import time
 from typing import List, Dict, Tuple
 
 
-class NYTBot(Bot):
+class NYTBot(NewsBot):
 
     def __init__(self):
         super().__init__("New York Times")

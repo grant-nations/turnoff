@@ -97,7 +97,3 @@ def run_bots():
 
     with open(failed_sites_path, "w") as f:
         json.dump(failed_sites, f, indent=2)
-
-
-if __name__ == "__main__":
-    run_bots()
