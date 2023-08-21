@@ -28,7 +28,7 @@ class FoxBot(NewsBot):
 
         options = Options()
         options.set_preference('javascript.enabled', False)
-        driver = webdriver.Firefox(options=options)
+        driver = webdriver.Firefox(executable_path="/snap/bin/firefox", options=options)
 
         base_url = 'https://foxnews.com'
         us_url = base_url + '/us'

@@ -28,7 +28,7 @@ class CNNBot(NewsBot):
 
         options = Options()
         options.set_preference('javascript.enabled', False)
-        driver = webdriver.Firefox(options=options)
+        driver = webdriver.Firefox(executable_path="/snap/bin/firefox", options=options)
 
         us_url = 'https://www.cnn.com/us'
 
