@@ -57,13 +57,13 @@ def run_bots():
 
             print(f"{len(articles)} articles collected")
 
-            for article in articles:
-                print_green("  " + CHECK_MARK, end="", flush=True)
-                print(f" {article['title']}")
+            # for article in articles:
+            #     print_green("  " + CHECK_MARK, end="", flush=True)
+            #     print(f" {article['title']}")
 
-            for failed_page in failed_pages:
-                print_red("  X", end="", flush=True)
-                print(f" {failed_page['page']}")
+            # for failed_page in failed_pages:
+            #     print_red("  X", end="", flush=True)
+            #     print(f" {failed_page['page']}")
 
             all_articles.append({
                 "source": bot.name,
