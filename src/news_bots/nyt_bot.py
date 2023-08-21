@@ -3,10 +3,11 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from src.news_bots.news_bot import NewsBot
 # import datetime
-from src.utils import get_current_date_string
+from src.utils import get_current_date_string, print_green, CHECK_MARK, print_red
 import re
 import time
 from typing import List, Dict, Tuple
+from selenium.webdriver.firefox.service import Service as FirefoxService
 
 
 class NYTBot(NewsBot):
@@ -15,8 +16,8 @@ class NYTBot(NewsBot):
         super().__init__("New York Times")
         # above sets self.name = "NYT"
 
-    def get_articles(self) -> Tuple[List[Dict[str, str]],
-                                    List[Dict[str, str]]]:
+    def get_articles(self, verbose: bool = True) -> Tuple[List[Dict[str, str]],
+                                                          List[Dict[str, str]]]:
         """
         Get today's articles from NYT
 
@@ -29,7 +30,9 @@ class NYTBot(NewsBot):
 
         options = Options()
         options.set_preference('javascript.enabled', False)
-        driver = webdriver.Firefox(options=options)
+        options.headless = True
+        service = FirefoxService(executable_path="/snap/bin/geckodriver")
+        driver = webdriver.Firefox(service=service, options=options)
 
         us_url = 'https://www.nytimes.com/section/us'
 
@@ -84,11 +87,19 @@ class NYTBot(NewsBot):
                     'text': article_text
                 })
 
+                if verbose:
+                    print_green("  " + CHECK_MARK, end="", flush=True)
+                    print(f" {title}")
+
             except Exception as e:
                 failed_pages.append({
                     'page': page,
                     'exception': str(e)
                 })
+
+                if verbose:
+                    print_red("  X", end="", flush=True)
+                    print(f" {page}")
 
         driver.quit()
 

@@ -6,7 +6,8 @@ import re
 import time
 from typing import List, Dict, Tuple
 import datetime
-from src.utils import month_to_number, is_month_name
+from src.utils import month_to_number, is_month_name, print_green, CHECK_MARK, print_red
+from selenium.webdriver.firefox.service import Service as FirefoxService
 
 
 class FoxBot(NewsBot):
@@ -14,8 +15,8 @@ class FoxBot(NewsBot):
     def __init__(self):
         super().__init__("Fox")
 
-    def get_articles(self) -> Tuple[List[Dict[str, str]],
-                                    List[Dict[str, str]]]:
+    def get_articles(self, verbose: bool = True) -> Tuple[List[Dict[str, str]],
+                                                          List[Dict[str, str]]]:
         """
         Get today's articles from Fox
 
@@ -28,7 +29,9 @@ class FoxBot(NewsBot):
 
         options = Options()
         options.set_preference('javascript.enabled', False)
-        driver = webdriver.Firefox(options=options)
+        options.headless = True
+        service = FirefoxService(executable_path="/snap/bin/geckodriver")
+        driver = webdriver.Firefox(service=service, options=options)
 
         base_url = 'https://foxnews.com'
         us_url = base_url + '/us'
@@ -116,11 +119,20 @@ class FoxBot(NewsBot):
                     'subtitle': subtitle,
                     'text': article_text
                 })
+
+                if verbose:
+                    print_green("  " + CHECK_MARK, end="", flush=True)
+                    print(f" {title}")
+
             except Exception as e:
                 failed_pages.append({
                     'page': page,
                     'exception': str(e)
                 })
+
+                if verbose:
+                    print_red("  X", end="", flush=True)
+                    print(f" {page}")
 
         driver.quit()
 

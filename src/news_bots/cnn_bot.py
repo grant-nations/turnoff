@@ -6,7 +6,7 @@ from src.news_bots.news_bot import NewsBot
 import re
 import time
 from typing import List, Dict, Tuple
-from src.utils import get_current_date_string
+from src.utils import get_current_date_string, print_green, CHECK_MARK, print_red
 
 from selenium.webdriver.firefox.service import Service as FirefoxService
 
@@ -16,7 +16,7 @@ class CNNBot(NewsBot):
     def __init__(self):
         super().__init__("CNN")
 
-    def get_articles(self) -> Tuple[List[Dict[str, str]],
+    def get_articles(self, verbose: bool = True) -> Tuple[List[Dict[str, str]],
                                     List[Dict[str, str]]]:
         """
         Get today's articles from CNN
@@ -31,7 +31,6 @@ class CNNBot(NewsBot):
         options = Options()
         options.set_preference('javascript.enabled', False)
         options.headless = True
-
         service = FirefoxService(executable_path="/snap/bin/geckodriver")
         driver = webdriver.Firefox(service=service, options=options)
 
@@ -91,11 +90,20 @@ class CNNBot(NewsBot):
                     'subtitle': "",  # NOTE: CNN articles don't have subtitles
                     'text': article_text
                 })
+
+                if verbose:
+                    print_green("  " + CHECK_MARK, end="", flush=True)
+                    print(f" {title}")
+
             except Exception as e:
                 failed_pages.append({
                     'page': page,
                     'exception': str(e)
                 })
+
+                if verbose:
+                    print_red("  X", end="", flush=True)
+                    print(f" {page}")
 
         driver.quit()
 

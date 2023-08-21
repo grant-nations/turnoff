@@ -7,10 +7,12 @@ class NewsBot(ABC):
         self.name = name
 
     @abstractmethod
-    def get_articles(self) -> Tuple[List[Dict[str, str]],
-                                    List[Dict[str, str]]]:
+    def get_articles(self, verbose: bool) -> Tuple[List[Dict[str, str]],
+                                                   List[Dict[str, str]]]:
         """
         Get today's articles from the news source
+
+        :param verbose: if True, print progress to the console
 
         :return: Tuple:
             list of dictionaries with title, subtitle, and text of each article
