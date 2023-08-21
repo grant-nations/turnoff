@@ -1,4 +1,4 @@
-# from selenium.webdriver.firefox.webdriver import WebDriver
+from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from src.news_bots.news_bot import NewsBot
@@ -7,9 +7,6 @@ from src.utils import get_current_date_string
 import re
 import time
 from typing import List, Dict, Tuple
-
-from selenium import webdriver
-from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 
 
 class WPBot(NewsBot):
@@ -31,7 +28,7 @@ class WPBot(NewsBot):
 
         options = Options()
         options.set_preference('javascript.enabled', False)
-        driver = webdriver.Firefox(firefox_binary=FirefoxBinary("/snap/bin/firefox"), options=options)
+        driver = webdriver.Firefox(options=options)
 
         us_url = 'https://www.washingtonpost.com'
 
