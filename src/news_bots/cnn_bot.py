@@ -8,6 +8,9 @@ import time
 from typing import List, Dict, Tuple
 from src.utils import get_current_date_string
 
+from webdriver_manager.firefox import GeckoDriverManager
+from selenium.webdriver.firefox.service import Service
+from webdriver_manager.firefox import GeckoDriverManager
 
 class CNNBot(NewsBot):
 
@@ -28,7 +31,10 @@ class CNNBot(NewsBot):
 
         options = Options()
         options.set_preference('javascript.enabled', False)
-        driver = webdriver.Firefox(options=options)
+
+        driver = webdriver.Firefox(service=Service(GeckoDriverManager().install()), options=options)
+
+        # driver = webdriver.Firefox(options=options)
 
         us_url = 'https://www.cnn.com/us'
 
@@ -95,3 +101,9 @@ class CNNBot(NewsBot):
         driver.quit()
 
         return articles, failed_pages
+
+if __name__ == "__main__":
+    bot = CNNBot()
+    articles, failed_pages = bot.get_articles()
+    print(articles)
+    print(failed_pages)
