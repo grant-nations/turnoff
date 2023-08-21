@@ -30,6 +30,7 @@ class CNNBot(NewsBot):
 
         options = Options()
         options.set_preference('javascript.enabled', False)
+        options.headless = True
 
         service = FirefoxService(executable_path="/snap/bin/geckodriver")
         driver = webdriver.Firefox(service=service, options=options)
