@@ -1,4 +1,4 @@
-from selenium import webdriver
+from selenium.webdriver.firefox.webdriver import WebDriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from src.news_bots.news_bot import NewsBot
@@ -28,7 +28,7 @@ class WPBot(NewsBot):
 
         options = Options()
         options.set_preference('javascript.enabled', False)
-        driver = webdriver.Firefox(executable_path="/snap/bin/firefox", options=options)
+        driver = WebDriver(executable_path="/snap/bin/firefox", options=options)
 
         us_url = 'https://www.washingtonpost.com'
 

@@ -1,7 +1,8 @@
-from selenium import webdriver
+# from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from src.news_bots.news_bot import NewsBot
+from selenium.webdriver.firefox.webdriver import WebDriver
 # import datetime
 from src.utils import get_current_date_string
 import re
@@ -29,7 +30,7 @@ class NYTBot(NewsBot):
 
         options = Options()
         options.set_preference('javascript.enabled', False)
-        driver = webdriver.Firefox(executable_path="/snap/bin/firefox", options=options)
+        driver = WebDriver(executable_path="/snap/bin/firefox", options=options)
 
         us_url = 'https://www.nytimes.com/section/us'
 
