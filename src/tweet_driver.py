@@ -1,3 +1,7 @@
+"""
+This file is the tweet driver. It takes the tweet text from the data folder and posts it to Twitter.
+"""
+
 from requests_oauthlib import OAuth1Session
 import os
 import json
@@ -6,12 +10,14 @@ import utils
 
 
 def post_tweet():
+    """
+    Post today's tweet to Twitter.
+    """
 
     payload = None
 
     # get today's tweet
     today = utils.get_current_date_string()
-    # today = utils.get_yesterday_date_string()
     tweet_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", today, "tweet.txt")
     with open(tweet_path, "r") as f:
         payload = {"text": f.read()}

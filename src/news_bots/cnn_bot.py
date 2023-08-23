@@ -2,7 +2,6 @@ from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from src.news_bots.news_bot import NewsBot
-# import datetime
 import re
 import time
 from typing import List, Dict, Tuple
@@ -17,7 +16,7 @@ class CNNBot(NewsBot):
         super().__init__("CNN")
 
     def get_articles(self, verbose: bool = True) -> Tuple[List[Dict[str, str]],
-                                    List[Dict[str, str]]]:
+                                                          List[Dict[str, str]]]:
         """
         Get today's articles from CNN
 
@@ -78,7 +77,7 @@ class CNNBot(NewsBot):
                         article_body = article.find_element(by=By.ID, value="body-text")
                     except Exception as e:
                         raise e
-                    
+
                 paragraphs = article_body.find_elements(by=By.TAG_NAME, value="p")
 
                 paragraphs_text = [p.text for p in paragraphs]

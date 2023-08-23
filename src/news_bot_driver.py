@@ -1,5 +1,6 @@
-# This file runs all of the bots and saves the data to JSON files.
-
+"""
+This file contains the driver for the news bots that scrape articles from news sites.
+"""
 
 from src.utils import print_green, print_red, CHECK_MARK, get_current_date_string
 from src.news_bots.nyt_bot import NYTBot
@@ -11,6 +12,9 @@ import os
 
 
 def run_bots():
+    """
+    Run all of the bots and save the data to JSON files.
+    """
 
     # | Create bots |
     # V             V
@@ -56,14 +60,6 @@ def run_bots():
             articles, failed_pages = bot.get_articles()
 
             print(f"{len(articles)} articles collected")
-
-            # for article in articles:
-            #     print_green("  " + CHECK_MARK, end="", flush=True)
-            #     print(f" {article['title']}")
-
-            # for failed_page in failed_pages:
-            #     print_red("  X", end="", flush=True)
-            #     print(f" {failed_page['page']}")
 
             all_articles.append({
                 "source": bot.name,

@@ -2,7 +2,6 @@ from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from src.news_bots.news_bot import NewsBot
-# import datetime
 from src.utils import get_current_date_string, print_green, CHECK_MARK, print_red
 import re
 import time
