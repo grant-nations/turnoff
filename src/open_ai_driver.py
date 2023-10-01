@@ -370,3 +370,7 @@ def write_tweet_from_summaries():
 
     with open(tweet_path, "w") as f:
         f.write(tweet)
+
+
+if __name__ == "__main__":
+    get_article_scores()
